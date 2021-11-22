@@ -36,7 +36,7 @@
 export default {
   data() {
     return {
-      
+      isResultInputFloat: false,
     }
   },
   computed: {
@@ -51,14 +51,21 @@ export default {
   },
   methods: {
     numbersOnly(value) {
+      if (this.inputValue.length == 0 && (value.key == '0' || value.key == ',')) {
+        value.preventDefault();
+      }     
+      if (this.inputValue.split('').find(item=>item==',') && value.key == ',') {
+        value.preventDefault();
+      }
       value = (value) ? value : window.event;
       var charCode = (value.which) ? value.which : value.keyCode;
-      if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+      if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 44) {
         value.preventDefault();
       } else {
         return true;
       }
-    }
+      
+    },
   }
 }
 </script>
