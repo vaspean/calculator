@@ -1,32 +1,180 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <!-- <h1>Calculator</h1> -->
+    <input id="result">
+    <div id="calc">
+      <ul>
+        <li class="calc__item"><button class="calc__button calc__button_top">С</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_top">±</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_top">%</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_right">/</button></li>
+
+        <li class="calc__item"><button class="calc__button calc__button_middle">7</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle">8</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle">9</button></li>
+        <li class="calc__item"><button  style="padding-bottom: 5px" class="calc__button calc__button_right">✖</button></li>
+
+        <li class="calc__item"><button class="calc__button calc__button_middle">4</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle">5</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle">6</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_right">−</button></li>
+
+        <li class="calc__item"><button class="calc__button calc__button_middle">1</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle">2</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle">3</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_right">+</button></li>
+
+        <li class="calc__item calc__item_null"><button class="calc__button calc__button_middle">0</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle">,</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_right">=</button></li>
+      </ul>
     </div>
-    <router-view/>
   </div>
 </template>
 
+<script>
+export default {
+  data() {
+    return {
+
+    }
+  }
+}
+</script>
+
 <style>
+@font-face {
+    font-family: 'Montserrat';
+    src:
+            url('./fonts/Montserrat-Regular.woff2') format('woff2'),
+            url('./fonts/Montserrat-Regular.woff') format('woff');
+    font-display: swap;
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src:
+            url('./fonts/Montserrat-SemiBold.woff2') format('woff2'),
+            url('./fonts/Montserrat-SemiBold.woff') format('woff');
+    font-display: swap;
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src:
+            url('./fonts/Montserrat-Bold.woff2') format('woff2'),
+            url('./fonts/Montserrat-Bold.woff') format('woff');
+    font-display: swap;
+    font-weight: 700;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Montserrat';
+    src:
+            url('./fonts/Montserrat-ExtraBold.woff2') format('woff2'),
+            url('./fonts/Montserrat-ExtraBold.woff') format('woff');
+    font-display: swap;
+    font-weight: 800;
+    font-style: normal;
+}
+
+* {
+  transition: 0.05s all;
+}
+
+:root {
+  --color-main: rgb(0, 140, 121,0.8);
+  --color-red: rgb(226, 125, 96);;
+  --color-background: rgb(0, 140, 121, 0.5);
+  --color-result: rgb(0, 140, 121, 0.3);
+  --color-button: rgb(0, 140, 121, 0.5);
+  --var-vertical-width: 5px;
+}
+
+html, body {
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  background: var(--color-background);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Montserrat", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
 }
 
-#nav {
-  padding: 30px;
+#result {
+  width: 331px;
+  height: 60px;
+  margin: 20px auto;
+  background: var(--color-result);
+  font-size: 40px;
+  font-weight: 600;
+  color: white;
+  outline: none;
+  text-align: right;
+  border: none;
 }
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+#calc {
+  margin: auto;
+  /* padding-left: 1px; */
+  width: 340px;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+#calc ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
+
+.calc__item {
+  width: 80px;
+  height: 60px;
+  padding-bottom: 5px;
+  /* margin-right: var(--var-vertical-width); */
+}
+
+.calc__item:hover {
+  opacity: .7;
+}
+
+.calc__button {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  font-size: 26px;
+  font-weight: 500;
+  /* border-radius: 40px; */
+}
+
+.calc__button_middle {
+  background: var(--color-main);
+  color: white !important;
+}
+
+.calc__button_right {
+  background: var(--color-red);
+}
+
+.calc__item_null {
+  width: calc(160px + var(--var-vertical-width));
+}
+
 </style>
