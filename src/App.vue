@@ -4,28 +4,28 @@
     <input v-model="inputValue" id="result" v-on:keypress="numbersOnly" placeholder="0">
     <div id="calc">
       <ul>
-        <li class="calc__item"><button class="calc__button calc__button_top">С</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_top">±</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_top" @click="clearInputValue">С</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_top" @click="reverseInputValue">±</button></li>
         <li class="calc__item"><button class="calc__button calc__button_top">%</button></li>
         <li class="calc__item"><button class="calc__button calc__button_right">/</button></li>
 
-        <li class="calc__item"><button class="calc__button calc__button_middle">7</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_middle">8</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_middle">9</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(7)">7</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(8)">8</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(9)">9</button></li>
         <li class="calc__item"><button  style="padding-bottom: 5px" class="calc__button calc__button_right">✖</button></li>
 
-        <li class="calc__item"><button class="calc__button calc__button_middle">4</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_middle">5</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_middle">6</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(4)">4</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(5)">5</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(6)">6</button></li>
         <li class="calc__item"><button class="calc__button calc__button_right">−</button></li>
 
-        <li class="calc__item"><button class="calc__button calc__button_middle">1</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_middle">2</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_middle">3</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(1)">1</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(2)">2</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(3)">3</button></li>
         <li class="calc__item"><button class="calc__button calc__button_right">+</button></li>
 
-        <li class="calc__item calc__item_null"><button class="calc__button calc__button_middle">0</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_middle">,</button></li>
+        <li class="calc__item calc__item_null"><button class="calc__button calc__button_middle" @click="pushNumber(0)">0</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(',')">,</button></li>
         <li class="calc__item"><button class="calc__button calc__button_right">=</button></li>
       </ul>
     </div>
@@ -66,6 +66,21 @@ export default {
       }
       
     },
+    pushNumber(number) {
+      if (this.inputValue.length == 0 && (number == '0' || number == ',')) {
+        return
+      }     
+      if (this.inputValue.split('').find(item=>item==',') && number == ',') {
+        return
+      }
+      this.inputValue += number; 
+    },
+    clearInputValue() {
+      this.inputValue = '';
+    },
+    reverseInputValue() {
+      this.inputValue.split('')[0] != '-' ? this.inputValue = '-' + this.inputValue : this.inputValue.split('').splice(0,1);
+    }
   }
 }
 </script>
