@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- <h1>Calculator</h1> -->
-    <input id="result">
+    <input v-model="inputValue" id="result" v-on:keypress="numbersOnly" placeholder="0">
     <div id="calc">
       <ul>
         <li class="calc__item"><button class="calc__button calc__button_top">С</button></li>
@@ -36,7 +36,28 @@
 export default {
   data() {
     return {
-
+      
+    }
+  },
+  computed: {
+    inputValue: {
+      get() {
+        return this.$store.state.inputValue
+      },
+      set(value) {
+        this.$store.commit('updateInputValue', value)
+      }
+    }
+  },
+  methods: {
+    numbersOnly(value) {
+      value = (value) ? value : window.event;
+      var charCode = (value.which) ? value.which : value.keyCode;
+      if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+        value.preventDefault();
+      } else {
+        return true;
+      }
     }
   }
 }
@@ -120,9 +141,10 @@ ul {
 }
 
 #result {
-  width: 331px;
+  width: 305px;
   height: 60px;
   margin: 20px auto;
+  padding: 0 15px;
   background: var(--color-result);
   font-size: 40px;
   font-weight: 600;
@@ -130,6 +152,11 @@ ul {
   outline: none;
   text-align: right;
   border: none;
+}
+
+#result::placeholder {
+  color: white;
+  opacity: 0.5;
 }
 
 #calc {
