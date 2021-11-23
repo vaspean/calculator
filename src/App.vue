@@ -6,27 +6,27 @@
       <ul>
         <li class="calc__item"><button class="calc__button calc__button_top" @click="clearInputValue">С</button></li>
         <li class="calc__item"><button class="calc__button calc__button_top" @click="reverseInputValue">±</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_top">%</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_right">/</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_top" @click="percent()">%</button></li>
+        <li class="calc__item"><button :class="{'calc__button_right_active': currentOperator=='division'}" class="calc__button calc__button_right" @click="interact('division')">/</button></li>
 
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(7)">7</button></li>
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(8)">8</button></li>
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(9)">9</button></li>
-        <li class="calc__item"><button  style="padding-bottom: 5px" class="calc__button calc__button_right">✖</button></li>
+        <li class="calc__item"><button :class="{'calc__button_right_active':currentOperator=='multiplication'}"  style="padding-bottom: 5px" class="calc__button calc__button_right" @click="interact('multiplication')">✖</button></li>
 
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(4)">4</button></li>
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(5)">5</button></li>
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(6)">6</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_right">−</button></li>
+        <li class="calc__item"><button :class="{'calc__button_right_active':currentOperator=='subtraction'}" class="calc__button calc__button_right" @click="interact('subtraction')">−</button></li>
 
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(1)">1</button></li>
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(2)">2</button></li>
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(3)">3</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_right">+</button></li>
+        <li class="calc__item"><button :class="{'calc__button_right_active':currentOperator=='addition'}" class="calc__button calc__button_right" @click="interact('addition')">+</button></li>
 
         <li class="calc__item calc__item_null"><button class="calc__button calc__button_middle" @click="pushNumber(0)">0</button></li>
         <li class="calc__item"><button class="calc__button calc__button_middle" @click="pushNumber(',')">,</button></li>
-        <li class="calc__item"><button class="calc__button calc__button_right">=</button></li>
+        <li class="calc__item"><button class="calc__button calc__button_right" @click="equals()">=</button></li>
       </ul>
     </div>
   </div>
@@ -36,7 +36,9 @@
 export default {
   data() {
     return {
-      isResultInputFloat: false,
+      operandMode: false,
+      localOperatorCurrent: 'none',
+      variableForMultiEqual: 0,
     }
   },
   computed: {
@@ -47,6 +49,22 @@ export default {
       set(value) {
         this.$store.commit('updateInputValue', value)
       }
+    },
+    operand: {
+      get() {
+        return this.$store.state.operand
+      },
+      set(value) {
+        this.$store.commit('updateOperand', value)
+      }
+    },
+    currentOperator: {
+      get() {
+        return this.$store.state.currentOperator
+      },
+      set(value) {
+        this.$store.commit('updateCurrentOperator', value)
+      }
     }
   },
   methods: {
@@ -56,16 +74,16 @@ export default {
       }     
       if (this.inputValue.split('').find(item=>item==',') && value.key == ',') {
         value.preventDefault();
-      }
-      // value = (value) ? value : window.event;
-      // var charCode = (value.which) ? value.which : value.keyCode;
-      // if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 44) {
-      //   value.preventDefault();
-      // } else {
-      //   return true;
-      // }   
+      }  
     },
     pushNumber(number) {
+      this.variableForMultiEqual = 0;
+      if (this.currentOperator != 'none') {
+        this.operand = this.inputValue;
+        this.inputValue = 0;
+        this.currentOperator = 'none';
+      }
+
       if (number == '.') {
         number = ',';
       }
@@ -73,13 +91,23 @@ export default {
         return
       }
       if (this.inputValue == '0' && number != ',') {
-        this.inputValue = `${number}`;
+        this.inputValue = number;
         return
       }
-      this.inputValue += `${number}`; 
+      this.inputValue += number; 
+    },
+    interact(operator) {
+      this.currentOperator == operator? this.currentOperator = 'none' : this.currentOperator = operator;
+      this.currentOperator != 'none'? this.swapOperandsFlag = true : this.swapOperandsFlag = false;
+      this.localOperatorCurrent = operator;
+
+      // this.currentOperator != 'none?'? 
     },
     clearInputValue() {
       this.inputValue = '0';
+      this.operand = '0';
+      this.localOperatorCurrent = 'none';
+      this.currentOperator = 'none';
     },
     reverseInputValue() {
       if (this.inputValue.split('')[0] != '-' && this.inputValue.length!=0 && this.inputValue != '0' && parseFloat(this.inputValue.replace(',','.'))!= 0) {
@@ -88,18 +116,51 @@ export default {
         this.inputValue = this.inputValue.slice(1);
       }
     },
+    percent(){
+      this.inputValue = parseFloat(this.inputValue.replace(',','.'))/100;
+    },
     backspaceResult(){
-      console.log(this.inputValue.length)
       if (this.inputValue.length == 1) {
         this.inputValue = '0';
       } else {
        this.inputValue = this.inputValue.slice(0,-1);
       }
+    },
+    equals(){ 
+      function strip(number) {
+          return (parseFloat(number.toPrecision(12)));
+      }
+      let firstValue;
+      let secondValue
+      if (this.variableForMultiEqual != 0) {
+        firstValue = parseFloat(this.variableForMultiEqual) ;
+        secondValue = parseFloat(this.inputValue.replace(',','.'));
+      } else {
+        firstValue = parseFloat(this.inputValue.replace(',','.'));
+        secondValue = parseFloat(this.operand.replace(',','.'));
+        this.variableForMultiEqual = firstValue;
+      }
+      
+      let result = 0;
+      switch(this.localOperatorCurrent) {
+        case 'addition': 
+          result = strip(secondValue + firstValue);
+        break
+        case 'subtraction':
+          result = strip(secondValue - firstValue);
+        break
+        case 'multiplication':
+          result = strip(secondValue * firstValue);
+        break
+        case 'division':
+          result = strip(secondValue / firstValue);
+        break
+      }
+      this.inputValue = result.toString().replace('.',',');
     }
   },
   mounted () {
     document.addEventListener('keydown', event=>{
-      console.log(event.key)
       if ((event.key>=0 && event.key <=9) || (event.key == ',') || (event.key == '.')) {
         this.pushNumber(event.key)
       }
@@ -108,6 +169,21 @@ export default {
       }
       if (event.key == 'Backspace') {
         this.backspaceResult();
+      }
+      if (event.key == '/') {
+        this.interact('division');
+      }
+      if (event.key == '*') {
+        this.interact('multiplication');
+      }
+      if (event.key == '-') {
+        this.interact('subtraction');
+      }
+      if (event.key == '+') {
+        this.interact('addition');
+      }
+      if (event.key == 'Enter') {
+        this.equals();
       }
     })
   }
@@ -161,7 +237,8 @@ export default {
 
 :root {
   --color-main: rgb(0, 140, 121,0.8);
-  --color-red: rgb(226, 125, 96);;
+  --color-red: rgb(226, 125, 96);
+  --color-orange: #E8A87C;
   --color-background: rgb(0, 140, 121, 0.5);
   --color-result: rgb(0, 140, 121, 0.3);
   --color-button: rgb(0, 140, 121, 0.5);
@@ -241,6 +318,7 @@ ul {
   border: 0;
   font-size: 26px;
   font-weight: 500;
+  cursor: pointer;
   /* border-radius: 40px; */
 }
 
@@ -251,6 +329,10 @@ ul {
 
 .calc__button_right {
   background: var(--color-red);
+}
+
+.calc__button_right_active {
+  background: var(--color-orange);
 }
 
 .calc__item_null {
