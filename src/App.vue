@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- <h1>Calculator</h1> -->
-    <input v-model="inputValue" id="result" v-on:keypress="numbersOnly" placeholder="0">
+    <div @click="backspaceResult"><input disabled v-model="inputValue" id="result" v-on:keypress="numbersOnly" placeholder="0"></div>
     <div id="calc">
       <ul>
         <li class="calc__item"><button class="calc__button calc__button_top" @click="clearInputValue">С</button></li>
@@ -57,35 +57,65 @@ export default {
       if (this.inputValue.split('').find(item=>item==',') && value.key == ',') {
         value.preventDefault();
       }
-      value = (value) ? value : window.event;
-      var charCode = (value.which) ? value.which : value.keyCode;
-      if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 44) {
-        value.preventDefault();
-      } else {
-        return true;
-      }
-      
+      // value = (value) ? value : window.event;
+      // var charCode = (value.which) ? value.which : value.keyCode;
+      // if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 44) {
+      //   value.preventDefault();
+      // } else {
+      //   return true;
+      // }   
     },
     pushNumber(number) {
-      if (this.inputValue.length == 0 && (number == '0' || number == ',')) {
-        return
-      }     
-      if (this.inputValue.split('').find(item=>item==',') && number == ',') {
+      if (number == '.') {
+        number = ',';
+      }
+      if (this.inputValue.length == 0 && number == ',' || this.inputValue.split('').find(item=>item==',') && number == ',') {
         return
       }
-      this.inputValue += number; 
+      if (this.inputValue == '0' && number != ',') {
+        this.inputValue = `${number}`;
+        return
+      }
+      this.inputValue += `${number}`; 
     },
     clearInputValue() {
-      this.inputValue = '';
+      this.inputValue = '0';
     },
     reverseInputValue() {
-      this.inputValue.split('')[0] != '-' ? this.inputValue = '-' + this.inputValue : this.inputValue.split('').splice(0,1);
+      if (this.inputValue.split('')[0] != '-' && this.inputValue.length!=0 && this.inputValue != '0' && parseFloat(this.inputValue.replace(',','.'))!= 0) {
+        this.inputValue = '-' + this.inputValue
+      } else if (this.inputValue.split('')[0] == '-') {
+        this.inputValue = this.inputValue.slice(1);
+      }
+    },
+    backspaceResult(){
+      console.log(this.inputValue.length)
+      if (this.inputValue.length == 1) {
+        this.inputValue = '0';
+      } else {
+       this.inputValue = this.inputValue.slice(0,-1);
+      }
     }
+  },
+  mounted () {
+    document.addEventListener('keydown', event=>{
+      console.log(event.key)
+      if ((event.key>=0 && event.key <=9) || (event.key == ',') || (event.key == '.')) {
+        this.pushNumber(event.key)
+      }
+      if (event.key == 'Delete') {
+        this.clearInputValue();
+      }
+      if (event.key == 'Backspace') {
+        this.backspaceResult();
+      }
+    })
   }
 }
 </script>
 
 <style>
+
 @font-face {
     font-family: 'Montserrat';
     src:
@@ -174,6 +204,7 @@ ul {
   outline: none;
   text-align: right;
   border: none;
+  cursor: pointer;
 }
 
 #result::placeholder {
